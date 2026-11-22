@@ -1,0 +1,24 @@
+[package]
+name = "paradedb-perf-bench"
+version = "0.1.0"
+edition = "2021"
+description = "Standalone perf bench for paradedb tokenizers (fork-only; avoids full workspace resolution which requires the datafusion git submodule + PG toolchain)"
+license = "AGPL-3.0"
+
+[workspace]
+
+[dependencies]
+tantivy = { git = "https://github.com/paradedb/tantivy.git", rev = "733db59d262675dcd8de3c2b1dc677653bccf8be", default-features = false }
+unicode-segmentation = "1.13.2"
+emojis = "0.9.0"
+icu_properties = "2.3.0"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "tokenizer_bench"
+harness = false
+
+[profile.bench]
+debug = false

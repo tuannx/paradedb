@@ -1,0 +1,76 @@
+{
+  "repo": "tuannx/paradedb",
+  "fork_commit": "48b2926",
+  "date": "2026-11-21",
+  "framework": "criterion 0.5.1 (--quick)",
+  "crate_measured": "tokenizers (real source files tokenizers/src/{ngram,edge_ngram,unicode_words}.rs via perf/bench #[path] include; simple_lowercase = tantivy SimpleTokenizer+LowerCaser, the pipeline SearchTokenizer::Simple builds)",
+  "rustc": "1.99.1 (RUSTUP_TOOLCHAIN=1.99.1; repo rust-toolchain.toml pins 1.100.0, overridden for this measurement)",
+  "environment": "shared VM ~1.5 CPU, CARGO_BUILD_JOBS=2, release/bench profile, isolated CARGO_HOME under ~/workspace/perf-rollout/cargo-home-paradedb (shared ~/.cargo package-cache lock was held by a parallel rollout job)",
+  "inputs": {
+    "short": "The quick brown fox jumps over the lazy dog (43 bytes)",
+    "medium": "fixed 142-byte ParadeDB sentence",
+    "long_x10": "fixed 516-byte paragraph repeated 10x (5160 bytes)"
+  },
+  "benches_ns": {
+    "edge_ngram2_10/medium": {
+      "mean_ns": 6461.5,
+      "ci_low_ns": 6389.8,
+      "ci_high_ns": 6533.2
+    },
+    "edge_ngram2_10/short": {
+      "mean_ns": 2262.8,
+      "ci_low_ns": 2143.9,
+      "ci_high_ns": 2381.7
+    },
+    "ngram2_3/medium": {
+      "mean_ns": 4680.7,
+      "ci_low_ns": 4568.8,
+      "ci_high_ns": 4792.7
+    },
+    "ngram2_3/short": {
+      "mean_ns": 1936.3,
+      "ci_low_ns": 1926.5,
+      "ci_high_ns": 1946.2
+    },
+    "simple_lowercase/long_x10": {
+      "mean_ns": 34097.8,
+      "ci_low_ns": 33332.6,
+      "ci_high_ns": 34863.0
+    },
+    "simple_lowercase/medium": {
+      "mean_ns": 991.6,
+      "ci_low_ns": 981.1,
+      "ci_high_ns": 1002.1
+    },
+    "simple_lowercase/short": {
+      "mean_ns": 588.2,
+      "ci_low_ns": 574.3,
+      "ci_high_ns": 602.2
+    },
+    "unicode_words/long_x10": {
+      "mean_ns": 294478.4,
+      "ci_low_ns": 271803.3,
+      "ci_high_ns": 317153.4
+    },
+    "unicode_words/medium": {
+      "mean_ns": 4622.2,
+      "ci_low_ns": 4580.6,
+      "ci_high_ns": 4663.7
+    },
+    "unicode_words/short": {
+      "mean_ns": 3312.5,
+      "ci_low_ns": 3245.4,
+      "ci_high_ns": 3379.5
+    }
+  },
+  "notes": [
+    "unicode_words/long_x10 is ~8.6x slower than simple_lowercase/long_x10 (294478.4 ns vs 34097.8 ns mean) in this run - real measured gap, worth profiling (per-bound emoji/unicode_words checks).",
+    "Criterion throughput figures in console output are not used: throughput was set on the group, so per-bench MiB/s is misleading; baseline uses time (ns) only.",
+    "Not covered: pg_search and all pgrx-based crates - this VM has no PostgreSQL/pg_config; full-workspace cargo resolution also requires fetching the datafusion git submodule, which timed out (>280s, and >1100s in the first attempt with shared cargo lock). Canonical in-crate bench tokenizers/benches/tokenizer_bench.rs is provided for a machine with the full toolchain.",
+    "Numbers are from a shared, throttled VM - treat as relative baseline for regression detection (>10% warn, >25% block), not absolute performance claims."
+  ],
+  "verdict_thresholds": {
+    "warn_regression_pct": 10,
+    "block_regression_pct": 25
+  }
+}
